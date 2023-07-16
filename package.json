@@ -1,0 +1,33 @@
+{
+  "name": "bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development webpack",
+    "start": "cross-env NODE_ENV=production node ./dist/app.js",
+    "build": "rimraf ./dist && webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "eslint": "^8.45.0",
+    "eslint-webpack-plugin": "^4.0.1",
+    "rimraf": "^5.0.1",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.1.6",
+    "webpack": "^5.88.1",
+    "webpack-cli": "^5.1.4"
+  },
+  "browser": {
+    "path": false,
+    "stream": false
+  },
+  "dependencies": {
+    "@discordjs/core": "^0.6.0",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.3.1"
+  }
+}
