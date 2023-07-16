@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack",
+    "webpack-dev": "cross-env NODE_ENV=development webpack watch ./src",
+    "nodemon-dev": "nodemon ./dist/app.js",
+    "dev": "npm run webpack-dev && npm run nodemon-dev",
     "start": "cross-env NODE_ENV=production node ./dist/app.js",
     "build": "rimraf ./dist && webpack"
   },
@@ -12,14 +14,17 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/express": "^4.17.17",
+    "concurrently": "^8.2.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.45.0",
     "eslint-webpack-plugin": "^4.0.1",
+    "nodemon": "^3.0.1",
     "rimraf": "^5.0.1",
     "ts-loader": "^9.4.4",
-    "typescript": "^5.1.6",
     "webpack": "^5.88.1",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
   },
   "browser": {
     "path": false,
@@ -27,7 +32,7 @@
   },
   "dependencies": {
     "@discordjs/core": "^0.6.0",
-    "discord.js": "^14.11.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
   }
 }

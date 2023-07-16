@@ -1,11 +1,13 @@
 const EslintWebpackPlugin = require("eslint-webpack-plugin")
 const path = require("path")
+const nodeExternals = require('webpack-node-externals')
 
 const mode = process.env.NODE_ENV || "production"
 const devMode = mode === "development"
 
 module.exports.default = {
   mode,
+  externals: [nodeExternals()],
   entry: "./src/index.ts",
   devtool: "cheap-source-map",
   target: "node",
@@ -14,7 +16,7 @@ module.exports.default = {
     filename: "app.js",
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js"],
+    extensions: [".ts", ".js"],
     extensionAlias: {
       ".js": [".js", ".ts"],
       ".cjs": [".cjs", ".cts"],
