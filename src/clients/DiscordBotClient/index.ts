@@ -1,6 +1,8 @@
 import { BotClient } from "@/interfaces"
 import { GatewayDispatchEvents } from "@discordjs/core"
 import { lunarVisionNotificationsChannelId } from "@/clients/DiscordBotClient/lunarVisionNotificationsChannelId"
+import { Haman } from "@/models/Haman"
+import { FileService } from "@/helpers/FileService"
 
 export class DiscordBotClient extends BotClient {
   declare ref: NodeJS.Timer | null
@@ -22,6 +24,8 @@ export class DiscordBotClient extends BotClient {
 
   setupHooks() {
     this.ref = setInterval(this.sendHamanNotification.bind(this), 3000)
+
+    const haman = new Haman(new FileService())
   }
 
   async sendHamanNotification() {
