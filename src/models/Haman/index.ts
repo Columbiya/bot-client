@@ -1,19 +1,28 @@
+import { Time } from "@/helpers"
+import { FileService } from "@/helpers"
 import { AppearableEntity } from "@/interfaces"
-import { DaysOfWeek } from "@/types"
+import { AppearTime } from "@/types"
+import * as path from "path"
 
 export class Haman implements AppearableEntity {
   // time of appearing in UTC+3
-  static appearTime: [string, DaysOfWeek]
+  appearTime: AppearTime[] = []
+  private entityName = "Хаман"
 
-  didAppear(): boolean {
-    throw new Error("not implemented")
+  constructor(private readonly fileService: FileService) {}
+
+  fetchAppearTime() {
+    const jsonPath = path.resolve(
+      process.cwd(),
+      "src",
+      "db",
+      "haman-appearance.json"
+    )
+    const json = this.fileService.getFileContents(jsonPath)
+    this.appearTime = JSON.parse(json)
   }
 
-  nextTimeToAppear(): Date {
-    throw new Error("not implemented")
-  }
-
-  leftTimeToAppearInMs(): number {
-    throw new Error("not implemented")
+  getEntityName(): string {
+    return this.entityName
   }
 }

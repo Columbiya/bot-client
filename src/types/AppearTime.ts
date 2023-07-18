@@ -1,0 +1,1 @@
+export type AppearTime = string[]

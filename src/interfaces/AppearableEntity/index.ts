@@ -1,5 +1,7 @@
+import { AppearTime } from "@/types"
+
 export abstract class AppearableEntity {
-  abstract didAppear(): boolean
-  abstract leftTimeToAppearInMs(): number
-  abstract nextTimeToAppear(): Date
+  declare appearTime: AppearTime[]
+  abstract fetchAppearTime(): void
+  abstract getEntityName(): string
 }
