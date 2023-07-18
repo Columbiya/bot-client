@@ -1,12 +1,10 @@
 import { BotClient } from "@/interfaces"
 import { GatewayDispatchEvents } from "@discordjs/core"
-import { Haman } from "@/models"
+import { Haman, Dragon } from "@/models"
 import { FileService } from "@/helpers"
 import { AppearableEntityWatcher } from "@/features"
 
 export class DiscordBotClient extends BotClient {
-  declare ref: NodeJS.Timer | null
-
   setupListeners(): void {
     this.once(GatewayDispatchEvents.Ready, async () => {
       console.log("ready")
@@ -24,6 +22,16 @@ export class DiscordBotClient extends BotClient {
       this
     )
 
+    const dragon = new Dragon(new FileService())
+    await dragon.fetchAppearTime()
+
+    const dragonAppearTimeWatcher = new AppearableEntityWatcher(
+      dragon,
+      threshholdMinutes,
+      this
+    )
+
     hamanAppearTimeWatcher.startWatching()
+    dragonAppearTimeWatcher.startWatching()
   }
 }

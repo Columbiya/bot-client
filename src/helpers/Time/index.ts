@@ -18,7 +18,13 @@ export class Time {
   getNowInUTC3(): Date {
     const now = new Date()
     const utc3Hours = now.getUTCHours() + 3
+
+    if (now.getHours() - 3 < 0) {
+      now.setDate(now.getDate() - 1)
+    }
+
     now.setHours(utc3Hours)
+
     return now
   }
 
