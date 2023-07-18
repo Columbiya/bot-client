@@ -13,6 +13,7 @@ export class App {
 
   init() {
     const client = this.factory.makeClient()
+
     client.setupListeners()
     client.setupHooks()
   }

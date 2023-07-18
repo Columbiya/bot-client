@@ -1,3 +1,1 @@
-import { DaysOfWeek } from "@/types"
-
-export type AppearTime = Record<string, DaysOfWeek>
+export type AppearTime = string[]

@@ -1,35 +1,28 @@
-import { FileService } from "@/helpers/FileService"
+import { Time } from "@/helpers"
+import { FileService } from "@/helpers"
 import { AppearableEntity } from "@/interfaces"
-import { DaysOfWeek } from "@/types"
+import { AppearTime } from "@/types"
 import * as path from "path"
-
-// console.log(__dirname) // D:\code\bns\bot\dist
 
 export class Haman implements AppearableEntity {
   // time of appearing in UTC+3
-  static appearTime: [string, DaysOfWeek]
+  appearTime: AppearTime[] = []
+  private entityName = "Хаман"
 
   constructor(private readonly fileService: FileService) {}
 
-  async fetchAppearTime() {
+  fetchAppearTime() {
     const jsonPath = path.resolve(
-      __dirname,
+      process.cwd(),
       "src",
       "db",
       "haman-appearance.json"
     )
-    const json = await this.fileService.getFileContents(jsonPath)
+    const json = this.fileService.getFileContents(jsonPath)
+    this.appearTime = JSON.parse(json)
   }
 
-  didAppear(): boolean {
-    throw new Error("not implemented")
-  }
-
-  nextTimeToAppear(): Date {
-    throw new Error("not implemented")
-  }
-
-  leftTimeToAppearInMs(): number {
-    throw new Error("not implemented")
+  getEntityName(): string {
+    return this.entityName
   }
 }
