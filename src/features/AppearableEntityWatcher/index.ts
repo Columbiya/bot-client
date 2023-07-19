@@ -7,8 +7,8 @@ export class AppearableEntityWatcher implements AppearableWatcher {
   declare ref: NodeJS.Timer
 
   private notificationPoints: [number, number] = [30, 10]
-  time: Time = new Time()
-  wordCase: WordCase = new WordCase()
+  time = new Time()
+  wordCase = new WordCase()
 
   constructor(
     private readonly entity: AppearableEntity,
@@ -17,7 +17,7 @@ export class AppearableEntityWatcher implements AppearableWatcher {
   ) {}
 
   didAppear(): boolean {
-    const todayAppearanceSchedule = this.getCurrentAppearanceSchedule()
+    const todayAppearanceSchedule = this.getAppearanceSchedule()
     const lastTimeOfAppear = this.findLastTime(
       this.time.getNowInUTC3(),
       todayAppearanceSchedule
@@ -26,15 +26,19 @@ export class AppearableEntityWatcher implements AppearableWatcher {
     if (!lastTimeOfAppear) return false
 
     const lastTimeDate = this.time.transformStringIntoDate(lastTimeOfAppear)
-    const now = new Date()
+    const now = this.time.getNowInUTC3()
 
     return Number(now) - Number(lastTimeDate) < this.threshold
   }
 
-  private getCurrentAppearanceSchedule(): AppearTime {
-    const now = this.time.getNowInUTC3()
-    const todayWeekDay = now.getDay()
+  private getAppearanceSchedule(date?: Date): AppearTime {
+    let now = this.time.getNowInUTC3()
 
+    if (date) {
+      now = date
+    }
+
+    const todayWeekDay = now.getDay()
     const todayAppearanceSchedule = this.entity.appearTime[todayWeekDay]
 
     return todayAppearanceSchedule
@@ -63,13 +67,22 @@ export class AppearableEntityWatcher implements AppearableWatcher {
   }
 
   nextTimeToAppear(): Date | null {
-    const todayAppearanceSchedule = this.getCurrentAppearanceSchedule()
+    const todayAppearanceSchedule = this.getAppearanceSchedule()
+    const now = this.time.getNowInUTC3()
 
-    const nextTime = this.findNextTime(
-      this.time.getNowInUTC3(),
-      todayAppearanceSchedule
-    )
-    if (!nextTime) return null
+    let nextTime = this.findNextTime(now, todayAppearanceSchedule)
+
+    if (!nextTime) {
+      // TODO refactor this
+      now.setDate(now.getDate() + 1)
+      nextTime = this.getAppearanceSchedule(now)[0]
+
+      const nextTimeDate = this.time.transformStringIntoDate(nextTime)
+      now.setHours(nextTimeDate.getHours())
+      now.setMinutes(nextTimeDate.getMinutes())
+
+      return now
+    }
 
     const nextTimeDate = this.time.transformStringIntoDate(nextTime)
     return nextTimeDate
@@ -109,12 +122,11 @@ export class AppearableEntityWatcher implements AppearableWatcher {
 
   private async checkAppearance() {
     const appearsIn = this.leftTimeToAppearInMs()
-
     if (!appearsIn) return
 
     const minutesLeftToAppear = this.time.getMinutesFromMs(appearsIn)
 
-    console.log(minutesLeftToAppear)
+    console.log(minutesLeftToAppear, this.entity.getEntityName())
 
     if (!this.notificationPoints.includes(minutesLeftToAppear)) return
 
@@ -126,7 +138,7 @@ export class AppearableEntityWatcher implements AppearableWatcher {
 
     if (!nextTime) return null
 
-    return Number(nextTime) - Number(this.time.getNowInUTC3())
+    return Math.abs(Number(nextTime) - Number(this.time.getNowInUTC3()))
   }
 
   private sendNotification(content: string) {
@@ -141,7 +153,7 @@ export class AppearableEntityWatcher implements AppearableWatcher {
   private makeMessage(leftTimeInMinutes: number) {
     const units: [string, string, string] = ["минута", "минуты", "минут"]
 
-    return `Хаман появляется через ${leftTimeInMinutes} ${this.wordCase.getWordCaseByNumber(
+    return `${this.entity.getEntityName()} появляется через ${leftTimeInMinutes} ${this.wordCase.getWordCaseByNumber(
       leftTimeInMinutes,
       units
     )}`
