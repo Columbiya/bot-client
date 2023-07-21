@@ -28,7 +28,10 @@ export class AppearableEntityWatcher implements AppearableWatcher {
     const lastTimeDate = this.time.transformStringIntoDate(lastTimeOfAppear)
     const now = this.time.getNowInUTC3()
 
-    return Number(now) - Number(lastTimeDate) < this.threshold
+    return (
+      Number(now) - Number(lastTimeDate) <
+      this.time.getMsFromMinutes(this.threshold)
+    )
   }
 
   private getAppearanceSchedule(date?: Date): AppearTime {
