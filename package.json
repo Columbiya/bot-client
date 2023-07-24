@@ -6,7 +6,7 @@
   "scripts": {
     "webpack-dev": "cross-env NODE_ENV=development webpack watch ./src",
     "nodemon-dev": "nodemon ./dist/app.js",
-    "dev": "npm run webpack-dev && npm run nodemon-dev",
+    "dev": "concurrently \"npm run webpack-dev\" \"npm run nodemon-dev\"",
     "start": "cross-env NODE_ENV=production node ./dist/app.js",
     "build": "rimraf ./dist && webpack"
   },
@@ -24,6 +24,7 @@
     "ts-loader": "^9.4.4",
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
     "webpack-node-externals": "^3.0.0"
   },
   "browser": {
