@@ -150,7 +150,7 @@ export class AppearableEntityWatcher implements AppearableWatcher {
     return Math.abs(Number(nextTime) - Number(this.time.getNowInUTC3()))
   }
 
-  private makeMessage(leftTimeInMinutes: number) {
+  makeMessage(leftTimeInMinutes: number) {
     const units: [string, string, string] = ["минута", "минуты", "минут"]
 
     return `${this.entity.getEntityName()} появляется через ${leftTimeInMinutes} ${this.wordCase.getWordCaseByNumber(
