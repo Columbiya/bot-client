@@ -31,7 +31,7 @@ export class DiscordBotClient extends BotClient {
       if (command === "show") {
         this.watcherCompositor
           .getAllEntitiesAppearings()
-          .forEach(this.sendNotification.bind(this, channel_id))
+          .forEach(this.sendNotification.bind(this, content, channel_id))
       }
     })
 
