@@ -1,19 +1,20 @@
-import { lunarVisionNotificationsChannelId } from "@/clients/DiscordBotClient/lunarVisionNotificationsChannelId"
+import { EventEmitter } from "node:events"
 import { Time, WordCase } from "@/helpers"
-import { AppearableEntity, AppearableWatcher, BotClient } from "@/interfaces"
-import { AppearTime } from "@/types"
+import { AppearableEntity, AppearableWatcher } from "@/interfaces"
+import { AppearTime, EventTypes } from "@/types"
 
 export class AppearableEntityWatcher implements AppearableWatcher {
   declare ref: NodeJS.Timer
 
-  private notificationPoints: [number, number] = [30, 10]
+  private notificationPoints: number[] = [30, 10]
+
   time = new Time()
   wordCase = new WordCase()
 
   constructor(
     private readonly entity: AppearableEntity,
-    private readonly threshold: number,
-    private readonly client: BotClient
+    private readonly emitter: EventEmitter,
+    private readonly threshold: number
   ) {}
 
   didAppear(): boolean {
@@ -133,7 +134,12 @@ export class AppearableEntityWatcher implements AppearableWatcher {
 
     if (!this.notificationPoints.includes(minutesLeftToAppear)) return
 
-    this.sendNotification(this.makeMessage(minutesLeftToAppear))
+    console.log("emit")
+
+    this.emitter.emit(
+      EventTypes.SEND_MESSAGE,
+      this.makeMessage(minutesLeftToAppear)
+    )
   }
 
   leftTimeToAppearInMs(): number | null {
@@ -144,16 +150,7 @@ export class AppearableEntityWatcher implements AppearableWatcher {
     return Math.abs(Number(nextTime) - Number(this.time.getNowInUTC3()))
   }
 
-  private sendNotification(content: string) {
-    return this.client.api.channels.createMessage(
-      lunarVisionNotificationsChannelId,
-      {
-        content,
-      }
-    )
-  }
-
-  private makeMessage(leftTimeInMinutes: number) {
+  makeMessage(leftTimeInMinutes: number) {
     const units: [string, string, string] = ["минута", "минуты", "минут"]
 
     return `${this.entity.getEntityName()} появляется через ${leftTimeInMinutes} ${this.wordCase.getWordCaseByNumber(

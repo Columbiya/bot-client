@@ -1,6 +1,6 @@
 const EslintWebpackPlugin = require("eslint-webpack-plugin")
 const path = require("path")
-const nodeExternals = require('webpack-node-externals')
+const nodeExternals = require("webpack-node-externals")
 
 const mode = process.env.NODE_ENV || "production"
 const devMode = mode === "development"
