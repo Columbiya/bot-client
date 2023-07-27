@@ -4,12 +4,12 @@ import { GatewayDispatchEvents } from "@discordjs/core"
 import { Haman, Dragon, Ballac } from "@/models"
 import { FileService } from "@/helpers"
 import { AppearableEntityWatcher, WatcherCompositor } from "@/features"
-import { lunarVisionNotificationsChannelId } from "./lunarVisionNotificationsChannelId"
 import { EventTypes } from "@/types"
 
 export class DiscordBotClient extends BotClient {
   emitter = new EventEmitter()
   watcherCompositor = new WatcherCompositor()
+  channelsToNotify = ["1134098935091318814", "1130031485802512445"]
 
   private botPrefix = "!bns"
 
@@ -80,8 +80,12 @@ export class DiscordBotClient extends BotClient {
   }
 
   private sendNotification(content: string) {
-    return this.api.channels.createMessage(lunarVisionNotificationsChannelId, {
-      content,
-    })
+    return Promise.all(
+      this.channelsToNotify.map((channel) =>
+        this.api.channels.createMessage(channel, {
+          content,
+        })
+      )
+    )
   }
 }
