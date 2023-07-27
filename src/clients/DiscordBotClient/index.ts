@@ -10,6 +10,7 @@ export class DiscordBotClient extends BotClient {
   emitter = new EventEmitter()
   watcherCompositor = new WatcherCompositor()
   channelsToNotify = ["1134098935091318814", "1130031485802512445"]
+  devChannel = "1130031485802512445"
 
   private botPrefix = "!bns"
 
