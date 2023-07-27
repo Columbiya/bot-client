@@ -31,11 +31,14 @@ export class DiscordBotClient extends BotClient {
       if (command === "show") {
         this.watcherCompositor
           .getAllEntitiesAppearings()
-          .forEach(this.sendNotification.bind(this))
+          .forEach(this.sendNotification.bind(this, channel_id))
       }
     })
 
-    this.emitter.on(EventTypes.SEND_MESSAGE, this.sendNotification.bind(this))
+    this.emitter.on(
+      EventTypes.SEND_TO_ALL_MESSAGE,
+      this.sendNotificationToAllChannels.bind(this)
+    )
   }
 
   private messageIsCommand(message: string) {
@@ -80,13 +83,29 @@ export class DiscordBotClient extends BotClient {
     this.watcherCompositor.add(ballacAppearTimeWatcher)
   }
 
-  private sendNotification(content: string) {
+  private sendNotificationToAllChannels(content: string) {
+    const devMode = process.env.NODE_ENV === "development"
+
+    if (devMode) {
+      this.api.channels.createMessage(this.devChannel, { content })
+      return
+    }
+
     return Promise.all(
       this.channelsToNotify.map((channel) =>
-        this.api.channels.createMessage(channel, {
-          content,
-        })
+        this.api.channels.createMessage(channel, { content })
       )
     )
+  }
+
+  private sendNotification(content: string, channelId: string) {
+    const devMode = process.env.NODE_ENV === "development"
+
+    if (devMode) {
+      this.api.channels.createMessage(this.devChannel, { content })
+      return
+    }
+
+    return this.api.channels.createMessage(channelId, { content })
   }
 }

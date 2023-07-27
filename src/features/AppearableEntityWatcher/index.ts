@@ -137,7 +137,7 @@ export class AppearableEntityWatcher implements AppearableWatcher {
     console.log("emit")
 
     this.emitter.emit(
-      EventTypes.SEND_MESSAGE,
+      EventTypes.SEND_TO_ALL_MESSAGE,
       this.makeMessage(minutesLeftToAppear)
     )
   }

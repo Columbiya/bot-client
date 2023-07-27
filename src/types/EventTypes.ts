@@ -1,3 +1,4 @@
 export enum EventTypes {
   SEND_MESSAGE = "SEND_MESSAGE",
+  SEND_TO_ALL_MESSAGE = "SEND_TO_ALL_MESSAGE",
 }
