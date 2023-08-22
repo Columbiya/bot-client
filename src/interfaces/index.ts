@@ -3,3 +3,6 @@ export { ClientFactory as ClientFactoryInterface } from "@/interfaces/ClientFact
 export { AppearableEntity } from "@/interfaces/AppearableEntity"
 export { AppearableWatcher } from "@/interfaces/AppearableWatcher"
 export { WatcherCompositor as WatcherCompositorInterface } from "@/interfaces/WatcherCompositor"
+export { Command } from "@/interfaces/Command"
+export { SlashCommand } from "@/interfaces/SlashCommand"
+export { CommandProcessor } from "@/interfaces/CommandProcessor"

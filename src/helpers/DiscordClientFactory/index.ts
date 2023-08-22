@@ -3,6 +3,7 @@ import { REST } from "@discordjs/rest"
 import { WebSocketManager } from "@discordjs/ws"
 import { DiscordBotClient } from "@/clients"
 import { intents } from "@/helpers/DiscordClientFactory/intents"
+import { CommandRegisterService } from "@/helpers"
 
 export class DiscordClientFactory implements ClientFactoryInterface {
   makeClient(): BotClient {
@@ -14,6 +15,9 @@ export class DiscordClientFactory implements ClientFactoryInterface {
       intents,
       rest,
     })
+
+    const commandRegisterService = new CommandRegisterService(rest)
+    commandRegisterService.registerCommands()
 
     const client = new DiscordBotClient({ rest, gateway })
 

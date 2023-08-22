@@ -1,0 +1,22 @@
+version: "3"
+services:
+  db:
+    image: "mysql"
+    container_name: "MySqlDb"
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: user
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_PASSWORD: 1234password
+      MYSQL_DATABASE: bns_bot
+    volumes:
+      - my-db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+  bot:
+    image: bot-client
+    restart: always
+    depends_on: [db]
+volumes:
+  my-db:

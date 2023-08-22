@@ -1,15 +1,24 @@
 import { EventEmitter } from "node:events"
 import { BotClient } from "@/interfaces"
-import { GatewayDispatchEvents } from "@discordjs/core"
+import {
+  APIInteractionResponseCallbackData,
+  GatewayDispatchEvents,
+  InteractionType,
+} from "@discordjs/core"
 import { Haman, Dragon, Ballac } from "@/models"
-import { FileService } from "@/helpers"
-import { AppearableEntityWatcher, WatcherCompositor } from "@/features"
+import { FileService, ServersService } from "@/helpers"
+import {
+  AppearableEntityWatcher,
+  CommandProcessor,
+  SlashCommandProcessor,
+  WatcherCompositor,
+} from "@/features"
 import { EventTypes } from "@/types"
 
 export class DiscordBotClient extends BotClient {
   emitter = new EventEmitter()
   watcherCompositor = new WatcherCompositor()
-  channelsToNotify = ["1134098935091318814", "1130031485802512445"]
+  discordServerService = new ServersService()
   devChannel = "1130031485802512445"
 
   private botPrefix = "!bns"
@@ -19,7 +28,7 @@ export class DiscordBotClient extends BotClient {
       console.log("ready")
     })
 
-    this.on(GatewayDispatchEvents.MessageCreate, ({ data }) => {
+    this.on(GatewayDispatchEvents.MessageCreate, ({ data, api }) => {
       if (data.author.bot) return
 
       const { content, channel_id } = data
@@ -27,17 +36,47 @@ export class DiscordBotClient extends BotClient {
 
       const command = content.split(" ")[1]
 
-      // refactor to commands pattern
-      if (command === "show") {
-        this.watcherCompositor
-          .getAllEntitiesAppearings()
-          .forEach((mes) => this.sendNotification(mes, channel_id))
-      }
+      const commandProcessor = new CommandProcessor(this.emitter, channel_id)
+      commandProcessor.processCommand(command)
     })
 
+    this.on(
+      GatewayDispatchEvents.InteractionCreate,
+      ({ data: interaction, api }) => {
+        if (
+          !interaction.data ||
+          !("name" in interaction.data) ||
+          interaction.type !== InteractionType.ApplicationCommand
+        )
+          return
+
+        const {
+          id,
+          token,
+          guild_id,
+          channel: { id: channel_id },
+        } = interaction
+
+        const slashCommandProcessor = new SlashCommandProcessor({
+          channel_id,
+          guild_id,
+          interactionId: id,
+          interactionToken: token,
+          emitter: this.emitter,
+        })
+
+        slashCommandProcessor.processCommand(interaction.data.name)
+      }
+    )
+
+    this.emitter.on(EventTypes.SEND_MESSAGE, this.sendNotification.bind(this))
     this.emitter.on(
       EventTypes.SEND_TO_ALL_MESSAGE,
-      this.sendNotificationToAllChannels.bind(this)
+      this.sendNotificationToAllSubscribedChannels.bind(this)
+    )
+    this.emitter.on(
+      EventTypes.REPLY_TO_INTERACTION,
+      this.replyToInteraction.bind(this)
     )
   }
 
@@ -83,19 +122,26 @@ export class DiscordBotClient extends BotClient {
     this.watcherCompositor.add(ballacAppearTimeWatcher)
   }
 
-  private sendNotificationToAllChannels(content: string) {
-    const devMode = process.env.NODE_ENV === "development"
+  private async sendNotificationToAllSubscribedChannels(content: string) {
+    const total =
+      await this.discordServerService.getTotalAmountOfActiveServerSubscriptions()
+    const limit = 10
+    let page = 1
 
-    if (devMode) {
-      this.api.channels.createMessage(this.devChannel, { content })
-      return
-    }
-
-    return Promise.all(
-      this.channelsToNotify.map((channel) =>
-        this.api.channels.createMessage(channel, { content })
+    do {
+      const generator = this.discordServerService.generateAllActiveServers(
+        limit,
+        page * limit - limit
       )
-    )
+
+      for await (let subs of generator) {
+        if (!subs.channel_id) continue
+
+        this.api.channels.createMessage(subs.channel_id, { content })
+      }
+
+      page += 1
+    } while (limit * page < total)
   }
 
   private sendNotification(content: string, channelId: string) {
@@ -107,5 +153,15 @@ export class DiscordBotClient extends BotClient {
     }
 
     return this.api.channels.createMessage(channelId, { content })
+  }
+
+  private replyToInteraction(
+    interactionId: string,
+    interactionToken: string,
+    data: APIInteractionResponseCallbackData
+  ) {
+    // refactor the amount of the parameters
+
+    return this.api.interactions.reply(interactionId, interactionToken, data)
   }
 }

@@ -4,6 +4,15 @@ import { AppearableWatcher, WatcherCompositorInterface } from "@/interfaces"
 export class WatcherCompositor implements WatcherCompositorInterface {
   private watchers: AppearableWatcher[] = []
   private time = new Time()
+  private static instance: WatcherCompositor
+
+  constructor() {
+    if (WatcherCompositor.instance) {
+      return WatcherCompositor.instance
+    }
+
+    WatcherCompositor.instance = this
+  }
 
   add(watcher: AppearableWatcher): void {
     this.watchers.push(watcher)

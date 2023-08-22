@@ -22,6 +22,7 @@
     "nodemon": "^3.0.1",
     "rimraf": "^5.0.1",
     "ts-loader": "^9.4.4",
+    "typescript": "^5.1.6",
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
@@ -32,8 +33,11 @@
     "stream": false
   },
   "dependencies": {
+    "@discordjs/builders": "^1.6.5",
     "@discordjs/core": "^0.6.0",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "mysql2": "^3.5.2",
+    "sequelize": "^6.32.1"
   }
 }

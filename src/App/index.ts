@@ -1,3 +1,4 @@
+import { sequelize } from "@/db/sequelize"
 import { ClientFactory } from "@/interfaces/ClientFactory"
 
 export class App {
@@ -11,10 +12,16 @@ export class App {
     App.instance = this
   }
 
-  init() {
-    const client = this.factory.makeClient()
+  async init() {
+    try {
+      await sequelize.sync()
+      await sequelize.authenticate()
+      const client = this.factory.makeClient()
 
-    client.setupListeners()
-    client.setupHooks()
+      client.setupListeners()
+      client.setupHooks()
+    } catch (e) {
+      console.log(e)
+    }
   }
 }
