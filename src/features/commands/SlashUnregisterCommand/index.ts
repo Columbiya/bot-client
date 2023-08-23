@@ -1,5 +1,5 @@
 import { SlashCommand } from "@/interfaces"
-import { EventTypes, SuccessMessages } from "@/types"
+import { ErrorMessages, EventTypes, SuccessMessages } from "@/types"
 import { MessageFlags } from "@discordjs/core"
 import { EventEmitter } from "node:events"
 import { SlashRegisterCommandData } from "../SlashRegisterCommand"
@@ -30,19 +30,31 @@ export class SlashUnregisterCommand implements SlashCommand {
   }
 
   async execute() {
-    await this.discordServerService.unregisterServer(
-      this.channel_id,
-      this.guild_id
-    )
+    try {
+      await this.discordServerService.unregisterServer(
+        this.channel_id,
+        this.guild_id
+      )
 
-    this.emitter.emit(
-      EventTypes.REPLY_TO_INTERACTION,
-      this.interactionId,
-      this.tokenId,
-      {
-        content: SuccessMessages.UNREGISTER_SUCCESS,
-        flags: MessageFlags.Ephemeral,
-      }
-    )
+      this.emitter.emit(
+        EventTypes.REPLY_TO_INTERACTION,
+        this.interactionId,
+        this.tokenId,
+        {
+          content: SuccessMessages.UNREGISTER_SUCCESS,
+          flags: MessageFlags.Ephemeral,
+        }
+      )
+    } catch (e) {
+      this.emitter.emit(
+        EventTypes.REPLY_TO_INTERACTION,
+        this.interactionId,
+        this.tokenId,
+        {
+          content: ErrorMessages.ENTITY_DOESNT_EXISTS,
+          flags: MessageFlags.Ephemeral,
+        }
+      )
+    }
   }
 }
