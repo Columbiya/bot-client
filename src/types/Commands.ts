@@ -1,5 +1,10 @@
 import { PermissionFlagsBits } from "@discordjs/core"
 
+export enum ChatCommands {
+  SHOW = "show",
+  SAY = "say",
+}
+
 export enum Commands {
   SHOW = "show",
   UNREGISTER = "unregister",

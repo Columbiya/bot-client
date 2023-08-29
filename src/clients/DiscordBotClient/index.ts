@@ -31,12 +31,16 @@ export class DiscordBotClient extends BotClient {
     this.on(GatewayDispatchEvents.MessageCreate, ({ data, api }) => {
       if (data.author.bot) return
 
-      const { content, channel_id } = data
+      const { content } = data
       if (!this.messageIsCommand(content)) return
 
-      const command = content.split(" ")[1]
+      const [prefix, command, ...messages] = content.split(" ")
 
-      const commandProcessor = new CommandProcessor(this.emitter, channel_id)
+      const commandProcessor = new CommandProcessor(
+        { ...data, content: messages.join(" ") },
+        this.emitter,
+        api
+      )
       commandProcessor.processCommand(command)
     })
 
